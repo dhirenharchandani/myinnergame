@@ -427,20 +427,7 @@
 </footer>
 
 <script>
-  // word-by-word reveal in hero headline
-  (function(){
-    var el=document.getElementById('heroHeadline');
-    if(!el) return;
-    var text=el.textContent.trim();
-    el.innerHTML='';
-    text.split(' ').forEach(function(word,i){
-      var s=document.createElement('span');
-      s.className='reveal';
-      s.textContent=word+' ';
-      s.style.animationDelay=(i*70)+'ms';
-      el.appendChild(s);
-    });
-  })();
+  // hero headline: static (word-by-word reveal removed — it was dropping spaces)
 
   // hamburger menu
   (function(){
