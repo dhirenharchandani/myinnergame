@@ -3,381 +3,207 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Inner Game Consulting</title>
+<title>My Inner Game®</title>
 <!--
   ============================================================================
-  DEVELOPER HANDOFF — Inner Game Consulting · tools landing page (prototype)
+  My Inner Game · landing page
   ============================================================================
-  WHAT THIS IS
-    A self-contained reference build. Open it directly in any browser
-    (double-click / file://) — no server, no build step, no dependencies.
-    It is a design+copy prototype to build the production page from, not
-    final production code.
+  Faithful HTML copy of the /tools page from the Framer project at
+  framer.com/projects/My-Inner-Game (captured 2026-05-23 from the Framer
+  preview while the page was still marked DRAFT in the editor).
 
-  POSITIONING
-    Marketing front door for the advisory practice — the four tools as proof
-    of operating rigour. Brand intentionally aligned to dhirenharchandani.com
-    (NOT the in-app violet/amber palette): charcoal/white, clean bold sans,
-    hierarchy via weight, one restrained amber accent line only.
+  STATE PARITY WITH FRAMER:
+    - Header, hero, closing CTA, footer reflect the finalised copy in Framer
+    - Three "tool" sections use placeholder image blocks (the three-shape
+      square/circle/triangle motif) because those areas are also unfilled
+      placeholders in Framer's source
+    - Body copy for the three tools is intentionally minimal — Framer's
+      source has partial/placeholder content there; fill in as the design
+      finalises
 
-  DESIGN TOKENS  (see :root in <style>)
-    charcoal #171717 · ink #262626 · grey #5c5c5c · soft #8a8a8a
-    line #e6e6e6 · paper #fff · paper-soft #fafafa · amber #b45309 (USE ONCE)
-    Type: Inter / Helvetica Neue / system. Headings 700, tight tracking.
-    Single responsive breakpoint at max-width:860px (stacks to one column).
-    Orange #f97316 is the logo brushstroke ONLY — never a UI accent.
+  WHEN THE FRAMER DESIGN UPDATES:
+    Re-capture from the same project and update this file accordingly. This
+    file is the source of truth for what's deployed.
 
-  PRODUCT SCREENSHOTS — swap-ready, no code change needed
-    Each device frame shows a grey skeleton placeholder until a real PNG
-    is added. Drop these files next to this HTML in an /assets folder:
-        assets/manifesto.png   (Strategy Manifesto)
-        assets/crm.png         (Inner Game CRM)
-        assets/dashboard.png   (Dashboard — also used in the hero laptop)
-        assets/journal.png     (Mindset Journal)
-    The <img onerror> auto-swaps: present = shows; missing = placeholder.
-    Recommended: landscape ~16:10, populated views (not empty states).
-    (These are auth-gated apps; screenshots must come from a logged-in
-    session — they cannot be captured automatically.)
-
-  DATA FAQ (bottom section)
-    Answers reflect Dhiren's confirmed policy: NO data retention, and FULL
-    data export on request. These are commitments — do not soften, hedge,
-    or add caveats to the wording.
-
-  THE FOUR TOOLS ARE INDEPENDENT
-    No suite, no shared account, no order, no data flow between them.
-    Do not reintroduce any "system / loop / flywheel" framing.
-
-  OPEN DECISIONS (confirm with Dhiren before final build)
-    1. Keep the single amber accent line, or go fully greyscale for strict
-       dhirenharchandani.com fidelity.
-    2. Whether to add a credibility band (client logos / one testimonial),
-       as the personal site does.
-    3. Final CTA target for "Start a conversation" (currently #start anchor).
+  STACK:
+    Single self-contained HTML. No build step. Google Fonts loaded remotely
+    (Instrument Serif + Inter). Open in any browser to preview locally.
   ============================================================================
 -->
-<!-- Aligned to dhirenharchandani.com: white/charcoal/grey, clean bold sans.
-     Four INDEPENDENT tools — no loop, no shared system.
-     Device frames are SWAP-READY: drop a PNG into /assets with the named
-     filename and it replaces the placeholder automatically.
-       hero laptop  -> assets/dashboard.png
-       Strategy Manifesto -> assets/manifesto.png
-       Inner Game CRM     -> assets/crm.png
-       Dashboard          -> assets/dashboard.png
-       Mindset Journal    -> assets/journal.png -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --charcoal:#171717;--ink:#262626;--grey:#5c5c5c;--grey-soft:#8a8a8a;
-    --line:#e6e6e6;--paper:#ffffff;--paper-soft:#fafafa;--amber:#b45309;
+    --ink:#0e0e0e;
+    --grey:#9a9a9a;
+    --grey-soft:#cfcfcf;
+    --line:#ececec;
+    --paper:#ffffff;
+    --paper-soft:#f5f5f5;
+    --pill:#0a0a0a;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
-  body{background:var(--paper);color:var(--ink);
-    font:400 18px/1.65 "Inter","Helvetica Neue",-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
-    -webkit-font-smoothing:antialiased}
-  h1,h2,h3{font-weight:700;letter-spacing:-.02em;line-height:1.12;color:var(--charcoal)}
-  .wrap{max-width:1120px;margin:0 auto;padding:0 48px}
+  body{
+    background:var(--paper);color:var(--ink);
+    font:400 17px/1.55 "Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .serif{font-family:"Instrument Serif",Georgia,"Times New Roman",serif;font-weight:400;letter-spacing:-.01em;line-height:1.05}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 24px}
   a{color:inherit;text-decoration:none}
-  .eyebrow{font-size:13px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--grey-soft)}
 
-  nav{position:sticky;top:0;z-index:50;background:var(--charcoal)}
-  .nav-in{display:flex;align-items:center;justify-content:space-between;height:74px}
-  .mark{display:flex;align-items:center;gap:11px;font-weight:700;font-size:16px;letter-spacing:.14em;text-transform:uppercase;color:#fff}
-  .brush{width:18px;height:18px;border-radius:5px;background:#f97316;transform:rotate(-8deg)}
-  .nav-links{display:flex;align-items:center;gap:32px}
-  .nav-links a.muted{font-size:13px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:rgba(255,255,255,.66)}
-  .nav-links a.muted:hover{color:#fff}
-  .btn{display:inline-block;background:var(--charcoal);color:#fff;padding:14px 26px;font-size:14px;font-weight:600;
-    letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--charcoal);transition:background .18s,color .18s;cursor:pointer}
-  .btn:hover{background:transparent;color:var(--charcoal)}
-  nav .btn{background:#fff;color:var(--charcoal);border-color:#fff;padding:12px 22px}
-  nav .btn:hover{background:transparent;color:#fff}
+  .pill{
+    display:inline-block;background:var(--pill);color:#fff;
+    padding:11px 22px;border-radius:999px;font-size:14px;font-weight:500;
+    letter-spacing:.01em;transition:opacity .15s;cursor:pointer;border:none;
+  }
+  .pill:hover{opacity:.85}
 
-  section{padding:112px 0}
+  header{padding:28px 0;background:var(--paper)}
+  .nav{display:flex;align-items:center;justify-content:space-between;gap:32px}
+  .brand{font-family:"Instrument Serif",Georgia,serif;font-size:22px;font-weight:400;color:var(--ink);letter-spacing:-.01em}
+  .brand sup{font-size:.55em;vertical-align:super;margin-left:2px;color:var(--ink)}
+  .navlinks{display:flex;align-items:center;gap:28px;flex:1;margin-left:24px}
+  .navlinks a{color:var(--grey);font-size:15px}
+  .navlinks a:hover{color:var(--ink)}
 
-  .hero{padding:120px 0 100px}
-  .hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
-  .hero .eyebrow{margin-bottom:24px}
-  .hero h1{font-size:48px;max-width:15ch}
-  .hero p{font-size:19px;color:var(--grey);max-width:48ch;margin:26px 0 40px}
+  .hero{padding:96px 0 80px;text-align:center}
+  .hero h1{font-size:84px;color:var(--ink);margin-bottom:6px}
+  .hero h1 .quiet{display:block;color:var(--grey-soft);margin-top:4px}
+  .hero .pill{margin-top:38px}
 
-  /* DEVICE FRAMES */
-  .laptop{width:100%}
-  .laptop .screen{position:relative;background:var(--charcoal);border-radius:14px;padding:12px;
-    box-shadow:0 30px 60px -24px rgba(23,23,23,.4)}
-  .laptop .bezel{position:relative;border-radius:6px;overflow:hidden;aspect-ratio:16/10;background:#fff}
-  .laptop .base{height:14px;width:100%;background:linear-gradient(#cfcfcf,#a8a8a8);
-    border-radius:0 0 12px 12px;box-shadow:0 14px 22px -14px rgba(23,23,23,.35)}
-  .laptop .notch{width:90px;height:5px;background:#000;border-radius:0 0 5px 5px;margin:0 auto}
+  .tool{padding:64px 0}
+  .tool .shell{
+    background:var(--paper-soft);border-radius:24px;
+    min-height:560px;display:flex;align-items:center;justify-content:center;
+    position:relative;overflow:hidden;
+  }
+  .ph-shapes{display:flex;gap:32px;align-items:center;justify-content:center;opacity:.85}
+  .ph-shapes .sq{width:72px;height:72px;background:#fff}
+  .ph-shapes .ci{width:84px;height:84px;background:#fff;border-radius:50%}
+  .ph-shapes .tr{width:0;height:0;border-left:46px solid transparent;border-right:46px solid transparent;border-bottom:80px solid #fff}
+  .tool .copy{padding:48px 0 0;text-align:center;max-width:740px;margin:0 auto}
+  .tool .label{font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--grey);margin-bottom:14px;font-weight:600}
+  .tool h2{font-size:46px;color:var(--ink);margin-bottom:16px}
+  .tool p{color:var(--grey);font-size:17px;line-height:1.65;max-width:54ch;margin:0 auto}
 
-  .browser{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;
-    box-shadow:0 18px 40px -22px rgba(23,23,23,.28)}
-  .browser .bar{height:38px;background:#f3f3f3;border-bottom:1px solid var(--line);
-    display:flex;align-items:center;gap:7px;padding:0 14px}
-  .browser .dot{width:9px;height:9px;border-radius:50%;background:#cfcfcf}
-  .browser .url{margin-left:12px;height:18px;flex:1;max-width:240px;background:#fff;border:1px solid var(--line);border-radius:5px}
-  .browser .body{position:relative;aspect-ratio:16/10;background:#fff}
+  .close{padding:140px 0 120px;text-align:center}
+  .close h2{font-size:74px;color:var(--ink);margin-bottom:28px}
+  .close .sub{color:var(--grey);font-size:18px;margin-bottom:34px;max-width:46ch;margin-left:auto;margin-right:auto}
 
-  .ph{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;gap:10px;
-    padding:26px;background:linear-gradient(140deg,#f7f7f8,#ececed)}
-  .ph .tag{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--grey-soft)}
-  .ph .skel{height:9px;border-radius:5px;background:#dedede}
-  .ph .skel.w1{width:46%}.ph .skel.w2{width:72%}.ph .skel.w3{width:58%}
-  .ph .cards{display:flex;gap:10px;margin-top:6px}
-  .ph .card{flex:1;height:42px;border-radius:7px;background:#e4e4e5}
-  .shot{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top}
+  footer{padding:48px 0 60px;border-top:1px solid var(--line);background:var(--paper)}
+  .foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px;font-size:13px;color:var(--grey)}
+  .foot .links{display:flex;gap:22px}
+  .foot a:hover{color:var(--ink)}
 
-  .belief{background:var(--paper-soft);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-  .belief .line{color:var(--amber);font-size:40px;font-weight:700;letter-spacing:-.02em;line-height:1.18;max-width:22ch}
-  .belief p{margin-top:30px;max-width:62ch;color:var(--ink);font-size:18px}
-
-  /* TOOLS — four independent blocks, no connecting spine */
-  .tools .eyebrow{margin-bottom:14px}
-  .tools h2{font-size:32px;margin-bottom:14px}
-  .tools .lede{color:var(--grey);max-width:56ch;margin-bottom:78px;font-size:18px}
-  .tool{display:grid;grid-template-columns:1.05fr 1fr;gap:56px;align-items:center;
-    padding:64px 0;border-top:1px solid var(--line)}
-  .tool:first-of-type{border-top:none;padding-top:0}
-  .tool.flip .tool-copy{order:2}
-  .tool.flip .tool-media{order:1}
-  .tool .kicker{font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--grey-soft);margin-bottom:14px}
-  .tool h3{font-size:26px;margin-bottom:8px}
-  .tool .stance{color:var(--ink);font-weight:500;font-size:18px;margin-bottom:22px;max-width:46ch}
-  .tool ul{list-style:none;display:flex;flex-direction:column;gap:12px;margin-bottom:18px}
-  .tool li{display:flex;gap:14px;font-size:16px;color:var(--grey)}
-  .tool li svg{flex:none;width:18px;height:18px;stroke:var(--charcoal);margin-top:3px;opacity:.7}
-  .tool .for{font-size:14px;color:var(--grey-soft)}
-  .tool .for b{color:var(--ink);font-weight:600}
-
-  .why{background:var(--paper-soft);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-  .why p{max-width:60ch;margin:0 auto;text-align:center;font-size:21px;line-height:1.55;color:var(--ink)}
-  .who p{max-width:26ch;margin:0 auto;text-align:center;font-size:34px;font-weight:700;line-height:1.22;letter-spacing:-.02em;color:var(--charcoal)}
-
-  .faq .eyebrow{margin-bottom:14px}
-  .faq h2{font-size:32px;margin-bottom:54px}
-  .faq .item{display:grid;grid-template-columns:.85fr 1.4fr;gap:48px;padding:28px 0;border-top:1px solid var(--line)}
-  .faq .item:last-child{border-bottom:1px solid var(--line)}
-  .faq .q{font-size:19px;font-weight:700;color:var(--charcoal);line-height:1.3;max-width:22ch}
-  .faq .a{font-size:17px;color:var(--grey);max-width:60ch}
-
-  .close{background:var(--charcoal);text-align:center}
-  .close h2{color:#fff;font-size:38px;margin-bottom:34px}
-  .close .btn{background:#fff;color:var(--charcoal);border-color:#fff}
-  .close .btn:hover{background:transparent;color:#fff}
-
-  footer{background:var(--charcoal);padding:38px 0;color:rgba(255,255,255,.55);font-size:13px;letter-spacing:.04em}
-  .fade{opacity:0;transform:translateY(14px);transition:opacity .55s ease,transform .55s ease}
+  .fade{opacity:0;transform:translateY(12px);transition:opacity .55s ease,transform .55s ease}
   .fade.in{opacity:1;transform:none}
 
   @media(max-width:860px){
-    .wrap{padding:0 24px}
-    section{padding:68px 0}
-    .hero{padding:80px 0 56px}
-    .hero-grid{grid-template-columns:1fr;gap:44px}
-    .hero h1{font-size:34px}
-    .belief .line{font-size:28px}
-    .tool{grid-template-columns:1fr;gap:30px;padding:48px 0}
-    .tool.flip .tool-copy{order:1}
-    .tool.flip .tool-media{order:2}
-    .who p{font-size:25px}
-    .faq h2{font-size:26px}
-    .faq .item{grid-template-columns:1fr;gap:12px;padding:24px 0}
-    .close h2{font-size:28px}
-    .nav-links a.muted{display:none}
+    .wrap{padding:0 20px}
+    .hero{padding:64px 0 56px}
+    .hero h1{font-size:52px}
+    .navlinks{display:none}
+    .tool{padding:36px 0}
+    .tool .shell{min-height:340px;border-radius:18px}
+    .ph-shapes{gap:18px}
+    .ph-shapes .sq{width:44px;height:44px}
+    .ph-shapes .ci{width:52px;height:52px}
+    .ph-shapes .tr{border-left:28px solid transparent;border-right:28px solid transparent;border-bottom:50px solid #fff}
+    .tool h2{font-size:32px}
+    .close{padding:80px 0 64px}
+    .close h2{font-size:42px}
   }
 </style>
 </head>
 <body>
 
-<nav id="nav">
-  <div class="wrap nav-in">
-    <div class="mark"><span class="brush"></span>Inner&nbsp;Game</div>
-    <div class="nav-links">
-      <a class="muted" href="#tools">Manifesto</a>
-      <a class="muted" href="#tools">CRM</a>
-      <a class="muted" href="#tools">Dashboard</a>
-      <a class="muted" href="#tools">Journal</a>
-      <a class="btn" href="mailto:transform@dhirenharchandani.com">Start a conversation</a>
+<header>
+  <div class="wrap nav">
+    <div class="brand">My Inner Game<sup>®</sup></div>
+    <div class="navlinks">
+      <a href="#tools">Tools</a>
+      <a href="#how">How it Works</a>
+      <a href="#faqs">FAQs</a>
     </div>
+    <a class="pill" href="mailto:transform@dhirenharchandani.com">Try Now</a>
   </div>
-</nav>
+</header>
 
 <section class="hero">
-  <div class="wrap hero-grid">
-    <div>
-      <div class="eyebrow fade in">Inner Game Consulting</div>
-      <h1 class="fade in">The tools I coach with, built to the same discipline I'd bring to your firm.</h1>
-      <p class="fade in">I advise founders and leadership teams of scaling services firms on where to play, how to win, and what survives execution. Four separate tools came out of that work — for my clients and for me.</p>
-      <a class="btn fade in" href="#start">Start a conversation</a>
-    </div>
-    <div class="laptop fade in">
-      <div class="screen">
-        <div class="notch"></div>
-        <div class="bezel">
-          <div class="ph">
-            <span class="tag">Inner Game</span>
-            <div class="skel w2"></div><div class="skel w1"></div>
-            <div class="cards"><div class="card"></div><div class="card"></div><div class="card"></div></div>
-            <div class="skel w3"></div>
-          </div>
-          <img class="shot" src="assets/dashboard.png" alt="" onerror="this.remove()">
-        </div>
-      </div>
-      <div class="base"></div>
-    </div>
+  <div class="wrap">
+    <h1 class="serif fade in">
+      Achieve Inner Clarity.
+      <span class="quiet">Three tools. One toolkit.</span>
+    </h1>
+    <a class="pill fade in" href="#tools">Explore</a>
   </div>
 </section>
 
-<section class="belief">
-  <div class="wrap">
-    <p class="line fade">Strategy that doesn't survive contact with the calendar was never strategy.</p>
-    <p class="fade">Most leadership teams don't have a strategy problem. They have an execution problem wearing a strategy costume. Each tool below is a separate, self-contained answer to a different part of that gap. They don't connect, sync, or depend on each other — use one, use none of the others, in whatever order serves the work.</p>
-  </div>
-</section>
+<section id="tools">
 
-<section class="tools" id="tools">
-  <div class="wrap">
-    <div class="eyebrow fade">The Tools</div>
-    <h2 class="fade">Four independent tools.</h2>
-    <p class="lede fade">Each was built for one job and stands entirely on its own. No suite, no shared account, no lock-in.</p>
-
-    <!-- STRATEGY MANIFESTO -->
-    <div class="tool fade">
-      <div class="tool-copy">
-        <div class="kicker">Strategy Manifesto</div>
-        <h3>The strategy your leadership team actually writes — and can't shortcut.</h3>
-        <p class="stance">A guided web app where a team authors its strategy through a 17-section framework, in order, with the thinking forced onto the page.</p>
-        <ul>
-          <li><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>Strategy, Operating Model, Governance, Quarterly Focus — seventeen sections end to end</li>
-          <li><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>Sections unlock in sequence — the team can't jump to execution before the strategy holds</li>
-          <li><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>Every question demands a written position, not a placeholder</li>
-          <li><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>Built for desk work — drafts persist across sessions and I can review them with you</li>
-        </ul>
-        <div class="for">For <b>founders and leadership teams</b> in a strategic-planning cycle.</div>
+  <div class="tool fade">
+    <div class="wrap">
+      <div class="shell">
+        <div class="ph-shapes"><div class="sq"></div><div class="ci"></div><div class="tr"></div></div>
       </div>
-      <div class="tool-media">
-        <div class="browser">
-          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div>
-          <div class="body">
-            <div class="ph"><span class="tag">Strategy Manifesto</span><div class="skel w2"></div><div class="skel w3"></div><div class="skel w1"></div><div class="cards"><div class="card"></div><div class="card"></div></div></div>
-            <img class="shot" src="assets/manifesto.png" alt="" onerror="this.remove()">
-          </div>
-        </div>
+      <div class="copy">
+        <div class="label">Tool One</div>
+        <h2 class="serif">Strategy Manifesto.</h2>
+        <p>A guided strategy webapp where your leadership team commits its plan to the page — a seventeen-section framework, in order, with no shortcuts.</p>
       </div>
     </div>
+  </div>
 
-    <!-- INNER GAME CRM -->
-    <div class="tool flip fade">
-      <div class="tool-copy">
-        <div class="kicker">Inner Game CRM</div>
-        <h3>Pipeline clarity and follow-up discipline, without enterprise-CRM weight.</h3>
-        <p class="stance">A lean relationship and pipeline tracker for operators who carry their own book — in daily use by around 200 people.</p>
-        <ul>
-          <li><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>Stage-weighted pipeline so the forecast reflects reality, not optimism</li>
-          <li><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>Follow-up scheduled automatically by stage — commitments don't quietly lapse</li>
-          <li><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>Stagnation alerts surface contacts going cold before they cost you</li>
-          <li><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>A Today view for what's overdue — one click to snooze or mark contacted</li>
-        </ul>
-        <div class="for">For <b>consultants, coaches, and solo operators</b> running their own pipeline.</div>
+  <div class="tool fade">
+    <div class="wrap">
+      <div class="shell">
+        <div class="ph-shapes"><div class="sq"></div><div class="ci"></div><div class="tr"></div></div>
       </div>
-      <div class="tool-media">
-        <div class="browser">
-          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div>
-          <div class="body">
-            <div class="ph"><span class="tag">Inner Game CRM</span><div class="skel w2"></div><div class="skel w1"></div><div class="cards"><div class="card"></div><div class="card"></div><div class="card"></div></div><div class="skel w3"></div></div>
-            <img class="shot" src="assets/crm.png" alt="" onerror="this.remove()">
-          </div>
-        </div>
+      <div class="copy">
+        <div class="label">Tool Two</div>
+        <h2 class="serif">Inner Game CRM.</h2>
+        <p>Pipeline clarity and follow-up discipline for operators carrying their own book — stage-weighted, stagnation-aware, no enterprise weight.</p>
       </div>
     </div>
+  </div>
 
-    <!-- DASHBOARD (COACHEE PORTAL) -->
-    <div class="tool fade">
-      <div class="tool-copy">
-        <div class="kicker">Dashboard</div>
-        <h3>The private portal every client I coach lives in between sessions.</h3>
-        <p class="stance">A per-client view of the whole engagement — what was said, what was committed, and where the movement is.</p>
-        <ul>
-          <li><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>Session recaps, action items, wins and growth edges in one place</li>
-          <li><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>A scorecard built around movement, not scores</li>
-          <li><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>Recurring patterns and quotes carried forward across the engagement</li>
-          <li><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>Next-quarter priorities, resources and agreements, private per client</li>
-        </ul>
-        <div class="for">For <b>every founder and leader</b> in a coaching engagement with me.</div>
+  <div class="tool fade">
+    <div class="wrap">
+      <div class="shell">
+        <div class="ph-shapes"><div class="sq"></div><div class="ci"></div><div class="tr"></div></div>
       </div>
-      <div class="tool-media">
-        <div class="browser">
-          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div>
-          <div class="body">
-            <div class="ph"><span class="tag">Dashboard</span><div class="cards"><div class="card"></div><div class="card"></div><div class="card"></div></div><div class="skel w2"></div><div class="skel w3"></div></div>
-            <img class="shot" src="assets/dashboard.png" alt="" onerror="this.remove()">
-          </div>
-        </div>
+      <div class="copy">
+        <div class="label">Tool Three</div>
+        <h2 class="serif">Inner Game Dashboard.</h2>
+        <p>Key business metrics and trends on one screen — so you know exactly where your business stands and where to steer it next.</p>
       </div>
     </div>
+  </div>
 
-    <!-- MINDSET JOURNAL -->
-    <div class="tool flip fade">
-      <div class="tool-copy">
-        <div class="kicker">Mindset Journal</div>
-        <h3>A daily practice for your own inner game — two minutes, morning and night.</h3>
-        <p class="stance">A phone-first habit tool that turns reflection into a short, repeatable practice instead of a blank page.</p>
-        <ul>
-          <li><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>Morning and evening check-ins that take minutes, not pages</li>
-          <li><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>A daily scorecard and a weekly reset to close the week honestly</li>
-          <li><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>A life assessment that resurfaces over time, not just once</li>
-          <li><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>Patterns recognised across entries, with a small learn library alongside</li>
-        </ul>
-        <div class="for">For <b>the operator</b> who wants the discipline they coach others toward.</div>
-      </div>
-      <div class="tool-media">
-        <div class="browser">
-          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div>
-          <div class="body">
-            <div class="ph"><span class="tag">Mindset Journal</span><div class="skel w2"></div><div class="skel w3"></div><div class="skel w1"></div><div class="skel w2"></div><div class="skel w3"></div></div>
-            <img class="shot" src="assets/journal.png" alt="" onerror="this.remove()">
-          </div>
-        </div>
-      </div>
+</section>
+
+<section class="close">
+  <div class="wrap">
+    <h2 class="serif fade">Get Your Tools Now?</h2>
+    <p class="sub fade">Three tools, one toolkit, built to be used together.</p>
+    <a class="pill fade" href="mailto:transform@dhirenharchandani.com">Try Now</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <div>My Inner Game<sup>®</sup> — Inner Game Consulting</div>
+    <div class="links">
+      <a href="#tools">Tools</a>
+      <a href="#how">How it Works</a>
+      <a href="#faqs">FAQs</a>
+      <a href="mailto:transform@dhirenharchandani.com">Contact</a>
     </div>
-
   </div>
-</section>
-
-<section class="why">
-  <div class="wrap">
-    <p class="fade">I don't recommend execution discipline I haven't run myself. Every tool here is something I use to coach with or to run my own practice. That's the entire point — and the reason each one stays simple.</p>
-  </div>
-</section>
-
-<section class="who">
-  <div class="wrap">
-    <p class="fade">Founders and leadership teams of scaling services firms who already have ambition and traction, and now need the discipline that makes them compound.</p>
-  </div>
-</section>
-
-<section class="faq">
-  <div class="wrap">
-    <div class="eyebrow fade">Questions</div>
-    <h2 class="fade">Straight answers on your data.</h2>
-
-    <div class="item fade"><div class="q">Who owns what I put in?</div><div class="a">You do. What you write, track, and decide is yours — not mine, and not the tool's.</div></div>
-    <div class="item fade"><div class="q">Can I get my data out?</div><div class="a">Yes, always. Your data is exportable in full — ask and you get it. It's yours; getting it out is never a negotiation.</div></div>
-    <div class="item fade"><div class="q">What happens to my data if I stop?</div><div class="a">I don't keep it. There's no retention to opt out of and nothing held back as leverage — when you're done, your data goes with you.</div></div>
-    <div class="item fade"><div class="q">Who can see what I enter?</div><div class="a">Only you. Every account is isolated at the database level — your records answer to your sign-in alone. The one exception is the client Dashboard, which is shared between you and me, and no one else.</div></div>
-    <div class="item fade"><div class="q">Do the tools share data with each other?</div><div class="a">No. Separate tools, separate sign-ins, separate databases. One can't see another, and nothing syncs between them. Using two means two unrelated accounts, by design.</div></div>
-    <div class="item fade"><div class="q">Is this a side project that might disappear?</div><div class="a">A fair question for tools built by one person. These run my own practice, and the CRM is in daily use by around 200 people. They're maintained because I depend on them — not as a hobby.</div></div>
-  </div>
-</section>
-
-<section class="close" id="start">
-  <div class="wrap">
-    <h2 class="fade">If the gap is execution, start there.</h2>
-    <a class="btn fade" href="mailto:transform@dhirenharchandani.com">Start a conversation</a>
-  </div>
-</section>
-
-<footer><div class="wrap">Built by Inner Game Consulting.</div></footer>
+</footer>
 
 <script>
   const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in')}),{threshold:.1});
