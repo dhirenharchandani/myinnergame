@@ -179,6 +179,42 @@
   .fade{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
   .fade.in{opacity:1;transform:none}
 
+  /* DARK MODE — flips on [data-theme="dark"] on <html> */
+  [data-theme="dark"]{
+    --ink:#f0ede8;
+    --ink-2:#c8c5bf;
+    --grey:#8a8680;
+    --grey-soft:#5a5651;
+    --line:#2c2925;
+    --paper:#161412;
+    --paper-card:#221f1c;
+    --pill:#f0ede8;
+  }
+  [data-theme="dark"] body{background-image:radial-gradient(rgba(255,255,255,.03) 1px,transparent 1px)}
+  [data-theme="dark"] header{background:rgba(22,20,18,.85)}
+  [data-theme="dark"] .pill{background:#f0ede8;color:#0a0a0a}
+  [data-theme="dark"] .pill.outline{background:transparent;color:var(--ink);border-color:var(--ink)}
+  [data-theme="dark"] .pill.outline:hover{background:var(--ink);color:#0a0a0a;opacity:1}
+  [data-theme="dark"] .pill.invert{background:#f0ede8;color:#0a0a0a}
+  [data-theme="dark"] .toggle,[data-theme="dark"] .menu{background:#221f1c;border-color:var(--line)}
+  [data-theme="dark"] .toggle svg{stroke:var(--ink)}
+  [data-theme="dark"] .menu svg line{stroke:#f0ede8 !important}
+  [data-theme="dark"] .brand sup{color:var(--ink)}
+  [data-theme="dark"] .brand .divider{background:var(--ink)}
+  [data-theme="dark"] .brand img{filter:invert(1) hue-rotate(180deg)}
+  [data-theme="dark"] .pill-grid a{border-color:var(--ink);color:var(--ink)}
+  [data-theme="dark"] .pill-grid a:hover{background:var(--ink);color:#0a0a0a}
+  [data-theme="dark"] .ph-shapes .sq,[data-theme="dark"] .ph-shapes .ci{background:#161412}
+  [data-theme="dark"] .ph-shapes .tr{border-bottom-color:#161412}
+  [data-theme="dark"] .menu-panel{background:#221f1c;border-color:var(--line);box-shadow:0 24px 48px -16px rgba(0,0,0,.6)}
+  [data-theme="dark"] .menu-panel a{color:var(--ink-2)}
+  [data-theme="dark"] .menu-panel a:hover{background:#161412;color:var(--ink)}
+  [data-theme="dark"] .faq-item summary::after{border-right-color:var(--ink);border-bottom-color:var(--ink)}
+  [data-theme="dark"] .why-card .qmark{color:var(--amber)}
+  [data-theme="dark"] .foot .built a,[data-theme="dark"] .foot .links a:hover{color:var(--ink)}
+  [data-theme="dark"] .foot .brand-block img{filter:invert(.92)}
+  /* Close section stays its native dark; cert/laptop images are PNGs with transparent or matching bg */
+
   /* Toast for mailto fallback */
   #toast{
     position:fixed;left:50%;bottom:32px;transform:translateX(-50%) translateY(20px);
@@ -440,6 +476,31 @@
 <div id="toast"></div>
 
 <script>
+  // dark mode toggle — localStorage with system-preference fallback on first visit
+  (function(){
+    var root=document.documentElement;
+    var btn=document.querySelector('.toggle');
+    function applyTheme(t){
+      if(t==='dark')root.setAttribute('data-theme','dark');
+      else root.removeAttribute('data-theme');
+    }
+    var saved=null;
+    try{saved=localStorage.getItem('theme');}catch(_){}
+    if(saved==='dark'||saved==='light'){
+      applyTheme(saved);
+    }else if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches){
+      applyTheme('dark');
+    }
+    if(btn){
+      btn.addEventListener('click',function(){
+        var isDark=root.getAttribute('data-theme')==='dark';
+        var next=isDark?'light':'dark';
+        applyTheme(next);
+        try{localStorage.setItem('theme',next);}catch(_){}
+      });
+    }
+  })();
+
   // hero headline: static (word-by-word reveal removed — it was dropping spaces)
 
   // mailto links: copy email to clipboard + show toast as a fallback for
