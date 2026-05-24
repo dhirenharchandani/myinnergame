@@ -179,6 +179,17 @@
   .fade{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
   .fade.in{opacity:1;transform:none}
 
+  /* Toast for mailto fallback */
+  #toast{
+    position:fixed;left:50%;bottom:32px;transform:translateX(-50%) translateY(20px);
+    background:var(--pill);color:#fff;padding:14px 22px;border-radius:999px;
+    font-size:14px;font-weight:500;letter-spacing:.01em;
+    box-shadow:0 12px 32px -8px rgba(0,0,0,.35);
+    opacity:0;pointer-events:none;z-index:1000;
+    transition:opacity .25s ease,transform .25s ease;
+  }
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
   @media(max-width:860px){
     .wrap{padding:0 20px}
     .hero{padding:56px 0 20px}
@@ -421,13 +432,45 @@
         <li><a href="https://dashboard.myinnergame.com/" target="_blank" rel="noopener">Dashboard</a></li>
         <li><a href="#journal">Journal <span style="font-size:11px;color:var(--grey-soft);margin-left:4px">(Coming Soon)</span></a></li>
         <li><a href="#faq">FAQs</a></li>
+        <li><a href="https://www.dhirenharchandani.com" target="_blank" rel="noopener">Dhiren Harchandani</a></li>
       </ul>
     </div>
   </div>
 </footer>
 
+<div id="toast"></div>
+
 <script>
   // hero headline: static (word-by-word reveal removed — it was dropping spaces)
+
+  // mailto links: copy email to clipboard + show toast as a fallback for
+  // visitors whose browser has no default mail client configured.
+  // Still lets the mailto: fire so users with a client get the compose window.
+  (function(){
+    var toast=document.getElementById('toast');
+    var hideTimer=null;
+    function showToast(msg){
+      if(!toast)return;
+      toast.textContent=msg;
+      toast.classList.add('show');
+      clearTimeout(hideTimer);
+      hideTimer=setTimeout(function(){toast.classList.remove('show')},3200);
+    }
+    document.querySelectorAll('a[href^="mailto:"]').forEach(function(a){
+      a.addEventListener('click',function(){
+        var email=a.getAttribute('href').replace('mailto:','').split('?')[0];
+        if(navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(email).then(function(){
+            showToast(email+' — copied to clipboard');
+          }).catch(function(){
+            showToast('Email: '+email);
+          });
+        }else{
+          showToast('Email: '+email);
+        }
+      });
+    });
+  })();
 
   // hamburger menu
   (function(){
