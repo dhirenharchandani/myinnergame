@@ -247,7 +247,7 @@ html,body{margin:0}
       <text x="342" y="128" class="d-li">• Prepares hourly drafts for FE review</text>
       <text x="342" y="156" class="d-li">• Matches disbursements to matters</text>
       <text x="342" y="184" class="d-li">• Builds monthly SOAs</text>
-      <text x="342" y="212" class="d-li">• Builds custom SOAs by matter or dept</text>
+      <text x="342" y="212" class="d-li">• Builds custom SOAs by matter, dept or client</text>
       <text x="342" y="240" class="d-li">• Produces the weekly aging report</text>
       <text x="342" y="268" class="d-li">• Drafts payment reminders per policy</text>
       <text x="342" y="296" class="d-li">• Drafts answers to invoice questions</text>
@@ -295,7 +295,7 @@ html,body{margin:0}
       <h3>Statements and collections</h3>
       <ul>
         <li>Monthly SOAs from Zoho</li>
-        <li>Custom SOAs by matter or department</li>
+        <li>Custom SOAs by matter, department or client</li>
         <li>Weekly aging report</li>
         <li>Payment reminder drafts</li>
       </ul>
@@ -378,7 +378,7 @@ html,body{margin:0}
 <script type="application/json" id="state">
 {
 "doc": "ar-coordinator-2026",
-"savedAt": "2026-10-20T00:00:00.000Z",
+"savedAt": "2026-10-20T12:00:00.000Z",
 "seat": [
 {
 "label": "Accountable owner",
@@ -442,7 +442,7 @@ html,body{margin:0}
 "id": "i5",
 "group": "Templates and examples",
 "title": "3–5 real SOAs",
-"detail": "Standard Zoho plus the custom matter-wise and department-wise versions",
+"detail": "Standard Zoho plus the custom versions by matter, department or client.",
 "status": "collect",
 "owner": ""
 },
@@ -450,7 +450,7 @@ html,body{margin:0}
 "id": "i6",
 "group": "Templates and examples",
 "title": "Custom-SOA client list",
-"detail": "Each client's format and recipients",
+"detail": "Each client's format (matter, department or client level) and recipients.",
 "status": "collect",
 "owner": ""
 },
@@ -522,7 +522,7 @@ html,body{margin:0}
 "id": "i15",
 "group": "Systems and access",
 "title": "LMS product and API",
-"detail": "API or export-only decides how much can be automated",
+"detail": "LMS connects to Zoho through an API. Confirm whether we can read from it directly.",
 "status": "confirm",
 "owner": ""
 },
@@ -546,8 +546,8 @@ html,body{margin:0}
 "id": "i18",
 "group": "Systems and access",
 "title": "Claude Team or Enterprise",
-"detail": "Firm data excluded from training; MFA and SSO on",
-"status": "build",
+"detail": "Confirmed on 20 Oct: the firm is already on a Claude Team plan.",
+"status": "have",
 "owner": ""
 }
 ],
@@ -557,8 +557,8 @@ html,body{margin:0}
 "sev": "crit",
 "label": "COMPLIANCE",
 "title": "Client confidentiality needs a written decision",
-"body": "SOAs and time entries carry client names, matter details and work descriptions. Decide which data may go to the AI and who signs off (FM plus a partner). Check it against the data-protection rules that apply to the firm.",
-"status": "open",
+"body": "SOAs and time entries carry client names, matter details and work descriptions. Decide which data may go to the AI and who signs off (FM plus a partner). Check it against the data-protection rules that apply to the firm. Agreed on 20 Oct: the data already lives in Zoho, so no separate decision is needed.",
+"status": "resolved",
 "owner": ""
 },
 {
@@ -622,9 +622,9 @@ html,body{margin:0}
 "stream": "gov",
 "title": "Confidentiality decision: what data may go to the AI, signed by FM and a partner",
 "owner": "FM",
-"status": "todo",
+"status": "done",
 "due": "2026-10-27",
-"notes": ""
+"notes": "Closed on 20 Oct: data already lives in Zoho."
 },
 {
 "id": "t3",
@@ -775,9 +775,9 @@ html,body{margin:0}
 "stream": "intake",
 "title": "Set up Claude Team or Enterprise with SSO and MFA",
 "owner": "FM",
-"status": "todo",
+"status": "done",
 "due": "2026-10-31",
-"notes": ""
+"notes": "Confirmed on 20 Oct: firm is on Claude Team."
 },
 {
 "id": "t20",
