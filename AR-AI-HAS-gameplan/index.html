@@ -1,0 +1,1044 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>AI AR Coordinator Build</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a single ledger column; diagram first, then phases, intake checklist, gaps, sequence */
+:root{
+  --bg:#f6f7f9; --surface:#ffffff; --fg:#1b2230; --muted:#5b6475; --line:#d9dde5;
+  --accent:#1f5f74; --accent-soft:#e3eef1;
+  --warn:#9a5b00; --warn-soft:#fbf0dc; --crit:#a23b2c; --crit-soft:#f8e4e0; --ok:#2f6b3d; --ok-soft:#e2f0e5;
+  --display:"Newsreader",Georgia,"Times New Roman",serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12161d; --surface:#1a2029; --fg:#e4e8ef; --muted:#9aa3b2; --line:#2e3644;
+  --accent:#6fb3c8; --accent-soft:#1d3139;
+  --warn:#e2a64a; --warn-soft:#352a17; --crit:#e88a7b; --crit-soft:#3a201c; --ok:#7cc48b; --ok-soft:#1b3121;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12161d; --surface:#1a2029; --fg:#e4e8ef; --muted:#9aa3b2; --line:#2e3644;
+  --accent:#6fb3c8; --accent-soft:#1d3139;
+  --warn:#e2a64a; --warn-soft:#352a17; --crit:#e88a7b; --crit-soft:#3a201c; --ok:#7cc48b; --ok-soft:#1b3121;
+  color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font:15px/1.6 var(--body)}
+.wrap{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:40px 64px;display:flex;flex-direction:column;gap:48px}
+h1,h2{font-family:var(--display);font-weight:600;text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(30px,5vw,42px)}
+h2{font-size:24px}
+h3{font-size:15px;font-weight:600;margin:0}
+p{margin:0}
+.eyebrow{font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.lede{color:var(--muted);max-width:65ch}
+section{display:flex;flex-direction:column;gap:18px}
+.sec-head{display:flex;flex-direction:column;gap:6px}
+
+/* seat card */
+header{display:flex;flex-direction:column;gap:14px}
+.seat{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));border:1px solid var(--line);border-radius:6px;background:var(--surface);margin-top:8px}
+.seat div{padding:12px 16px;border-right:1px solid var(--line);min-width:0}
+.seat div:last-child{border-right:0}
+.seat dt{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.seat dd{margin:2px 0 0;font-weight:500;font-variant-numeric:tabular-nums}
+
+/* diagram */
+.diagram{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--surface);padding:12px}
+.diagram svg{display:block;min-width:760px;width:100%;height:auto}
+.d-box{fill:var(--bg);stroke:var(--line);stroke-width:1.2}
+.d-core{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}
+.d-gate{fill:var(--warn-soft);stroke:var(--warn);stroke-width:1.5}
+.d-tobuild{stroke-dasharray:5 4}
+.d-t{fill:var(--fg);font:600 14px var(--body)}
+.d-s{fill:var(--muted);font:400 12px var(--body)}
+.d-m{fill:var(--accent);font:500 11px var(--mono);letter-spacing:.05em}
+.d-gm{fill:var(--warn);font:500 11px var(--mono);letter-spacing:.05em}
+.d-li{fill:var(--fg);font:400 13px var(--body)}
+.d-arrow{stroke:var(--muted);stroke-width:1.4;fill:none}
+.d-arrow-a{stroke:var(--accent);stroke-width:1.6;fill:none}
+.d-head{fill:var(--muted)}
+.d-head-a{fill:var(--accent)}
+.legend{display:flex;flex-wrap:wrap;gap:16px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:22px;height:12px;border-radius:2px;border:1.5px solid var(--line);display:inline-block}
+.sw.core{background:var(--accent-soft);border-color:var(--accent)}
+.sw.gate{background:var(--warn-soft);border-color:var(--warn)}
+.sw.build{border-style:dashed;border-color:var(--muted)}
+
+/* phases */
+.phases{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.phase{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.phase .tag{font:500 12px var(--mono);color:var(--accent)}
+.phase ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.phase .why{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px;margin-top:auto}
+.phase.now{border-color:var(--accent);box-shadow:inset 0 3px 0 var(--accent)}
+.note{font-size:14px;color:var(--muted);max-width:75ch}
+.note strong{color:var(--fg)}
+
+/* intake checklist */
+.progress{display:flex;align-items:center;gap:12px;font:500 13px var(--mono);color:var(--muted)}
+.bar{flex:1;max-width:280px;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .25s}
+.groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.group{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px 18px;min-width:0}
+.group h3{font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.item{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start;padding:8px 0;border-top:1px solid var(--line)}
+.item:first-of-type{border-top:0}
+.item > div{min-width:0}
+.item b{font-weight:500}
+.item small{display:block;color:var(--muted);font-size:13px;line-height:1.45}
+.chip{font:500 11px var(--mono);padding:2px 7px;border-radius:3px;white-space:nowrap;margin-top:2px}
+.chip.have{background:var(--ok-soft);color:var(--ok)}
+.chip.missing{background:var(--crit-soft);color:var(--crit)}
+.chip.build{background:var(--warn-soft);color:var(--warn)}
+.chip.get{background:var(--accent-soft);color:var(--accent)}
+input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* gaps */
+.gaps{display:flex;flex-direction:column;gap:10px}
+.gap{display:grid;grid-template-columns:4px 1fr;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px 16px 14px 0;overflow:hidden}
+.gap::before{content:"";border-radius:0 2px 2px 0}
+.gap.crit::before{background:var(--crit)}
+.gap.warn::before{background:var(--warn)}
+.gap div{display:flex;flex-direction:column;gap:4px;min-width:0}
+.gap .ws{font:500 11px var(--mono);letter-spacing:.05em;color:var(--muted)}
+.gap p{font-size:14px;color:var(--muted)}
+.gap p strong{color:var(--fg);font-weight:500}
+
+/* sequence */
+.seq{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+.step{padding:18px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:6px;min-width:0}
+.step:last-child{border-right:0}
+.step .when{font:500 12px var(--mono);color:var(--accent)}
+.step p{font-size:14px;color:var(--muted)}
+@media (max-width:760px){.step{border-right:0;border-bottom:1px solid var(--line)}.step:last-child{border-bottom:0}.seat div{border-right:0;border-bottom:1px solid var(--line)}.seat div:last-child{border-bottom:0}}
+
+/* workstream */
+.ws-summary{display:flex;flex-wrap:wrap;gap:8px 18px;font:500 13px var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.ws-summary b{color:var(--fg);font-weight:500}
+.ws-summary .od b{color:var(--crit)}
+.ws-board{border:1px solid var(--line);border-radius:6px;background:var(--surface);overflow:hidden}
+.ws-stream{border-top:1px solid var(--line)}
+.ws-stream:first-child{border-top:0}
+.ws-stream-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:12px 16px;background:var(--bg)}
+.ws-stream-h h3{font-size:14px}
+.ws-stream-h span{font:500 12px var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.ws-row{display:grid;grid-template-columns:118px minmax(0,1fr) 130px 140px 30px;gap:12px;align-items:center;padding:8px 16px;border-top:1px solid var(--line)}
+.ws-title{min-width:0;font-size:14px}
+.ws-row.done .ws-title{color:var(--muted);text-decoration:line-through}
+.ws-row select,.ws-row input,.ws-add select,.ws-add input{font:inherit;font-size:13px;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:5px 7px;min-width:0;width:100%}
+.ws-row input[type=date]{font-family:var(--mono);font-size:12px}
+.ws-row select.st{font:500 12px var(--mono);border-color:transparent;cursor:pointer}
+.st[data-s=todo]{background:var(--bg);color:var(--muted)}
+.st[data-s=doing]{background:var(--accent-soft);color:var(--accent)}
+.st[data-s=blocked]{background:var(--crit-soft);color:var(--crit)}
+.st[data-s=done]{background:var(--ok-soft);color:var(--ok)}
+.ws-row.late input[type=date]{border-color:var(--crit);color:var(--crit)}
+.ws-del{border:0;background:none;color:var(--muted);cursor:pointer;font:500 15px var(--mono);padding:4px;border-radius:4px;white-space:nowrap}
+.ws-del:hover{color:var(--crit)}
+.ws-del.arm{color:var(--crit);font-size:11px}
+.ws-msg{padding:20px 16px;color:var(--muted);font-size:14px}
+.ws-add{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) auto;gap:10px;align-items:end;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px 16px}
+.ws-add label{display:flex;flex-direction:column;gap:4px;font:500 11px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);min-width:0}
+.ws-add button{font:500 13px var(--body);background:var(--accent);color:var(--surface);border:0;border-radius:4px;padding:8px 16px;cursor:pointer}
+.ws-add button:disabled{opacity:.5;cursor:default}
+.ws-err{color:var(--crit);font-size:13px}
+.ws-row select:focus-visible,.ws-row input:focus-visible,.ws-add :focus-visible,.ws-del:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+@media (max-width:760px){
+  .ws-row{grid-template-columns:minmax(0,1fr) 30px;gap:8px}
+  .ws-row .ws-title{grid-column:1;grid-row:1}
+  .ws-row .ws-del{grid-column:2;grid-row:1}
+  .ws-row .st,.ws-row .ow,.ws-row .du{grid-column:1 / -1}
+  .ws-add{grid-template-columns:1fr}
+}
+footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+.ed{border-radius:3px;outline:none;cursor:text;box-shadow:inset 0 -1px 0 var(--line);transition:background .15s}
+.ed:hover{background:var(--accent-soft)}
+.ed:focus{background:var(--accent-soft);box-shadow:inset 0 -2px 0 var(--accent)}
+.ed:empty::before{content:attr(data-ph);color:var(--muted);opacity:.7}
+.toolbar{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--line)}
+.toolbar-in{max-width:1040px;margin:0 auto;padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
+.toolbar p{font-size:13px;color:var(--muted);flex:1;min-width:220px;margin:0}
+.toolbar p b{color:var(--fg);font-weight:500}
+.save-state{font:500 12px var(--mono);color:var(--muted);white-space:nowrap}
+.save-state.warn{color:var(--crit)}
+.btn{font:500 13px var(--body);background:var(--accent);color:var(--surface);border:0;border-radius:4px;padding:8px 16px;cursor:pointer;white-space:nowrap}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.chipsel{font:500 11px var(--mono);border:0;border-radius:3px;padding:3px 6px;cursor:pointer;max-width:100%}
+.chipsel.ok{background:var(--ok-soft);color:var(--ok)}
+.chipsel.crit{background:var(--crit-soft);color:var(--crit)}
+.chipsel.warn{background:var(--warn-soft);color:var(--warn)}
+.chipsel.acc{background:var(--accent-soft);color:var(--accent)}
+.item-side{display:flex;flex-direction:column;align-items:flex-end;gap:6px;min-width:0}
+.mini{font:inherit;font-size:12px;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:3px 6px;width:110px;min-width:0}
+.gap{grid-template-columns:4px minmax(0,1fr) auto}
+.gap.done{opacity:.65}
+.gap.done h3{text-decoration:line-through}
+.gap-side{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.seat dd.ed{display:block}
+.ws-notes{grid-column:2 / span 3;font-size:13px;color:var(--muted)}
+@media (max-width:760px){.gap{grid-template-columns:4px minmax(0,1fr)}.gap-side{grid-column:2;flex-direction:row;align-items:center}.ws-notes{grid-column:1 / -1}}
+@media print{.toolbar,.ws-add,.ws-del{display:none}}
+</style>
+</head>
+<body>
+<div class="toolbar"><div class="toolbar-in">
+  <p><b>This page is editable.</b> Click any underlined text, status or date to change it. When you're done, download an updated copy and send that file back.</p>
+  <span class="save-state" id="save-state">No changes yet</span>
+  <button class="btn" id="download" type="button">Download updated copy</button>
+</div></div>
+<div class="wrap">
+
+<header>
+  <span class="eyebrow">Should We Hire AI? · Seat under review</span>
+  <h1>Building the AI AR Coordinator</h1>
+  <p class="lede">What the firm needs in hand to automate billing, statements of account and collections, built from the 2026 Billing &amp; Collection process and the team worksheet of 18/10/2026.</p>
+  <dl class="seat" id="seat"></dl>
+</header>
+
+<section>
+  <div class="sec-head">
+    <span class="eyebrow">How it fits together</span>
+    <h2>Systems and the review gate</h2>
+    <p class="lede">The coordinator reads from the firm's systems and produces drafts. Nothing reaches a client until the FM signs it off. Lawyers, FEs and the HOD keep their approvals.</p>
+  </div>
+  <div class="diagram" role="img" aria-label="Diagram: LMS, Zoho, LOE register and disbursement records feed the AI AR Coordinator, which drafts invoices, SOAs and reminders. Drafts pass through FM review before reaching the client by Outlook. Lawyers, FEs and HOD confirm stages and approve hourly invoices.">
+    <svg viewBox="0 0 1000 480" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="d-head"/></marker>
+        <marker id="aha" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="d-head-a"/></marker>
+      </defs>
+
+      <text x="20" y="18" class="d-m">SOURCES</text>
+      <rect x="20" y="30" width="210" height="72" rx="5" class="d-box"/>
+      <text x="36" y="58" class="d-t">LMS</text>
+      <text x="36" y="80" class="d-s">Time entries, hourly drafts, tax invoices</text>
+
+      <rect x="20" y="120" width="210" height="72" rx="5" class="d-box"/>
+      <text x="36" y="148" class="d-t">Zoho</text>
+      <text x="36" y="170" class="d-s">Invoices, payments, monthly SOAs</text>
+
+      <rect x="20" y="210" width="210" height="72" rx="5" class="d-box d-tobuild"/>
+      <text x="36" y="238" class="d-t">LOE register</text>
+      <text x="36" y="260" class="d-s">Fee type, stages, terms (to build)</text>
+
+      <rect x="20" y="300" width="210" height="72" rx="5" class="d-box"/>
+      <text x="36" y="328" class="d-t">Disbursement records</text>
+      <text x="36" y="350" class="d-s">Court fees, card, supplier invoices</text>
+
+      <path d="M230,66 L318,110" class="d-arrow" marker-end="url(#ah)"/>
+      <path d="M230,156 L318,170" class="d-arrow" marker-end="url(#ah)"/>
+      <path d="M230,246 L318,232" class="d-arrow" marker-end="url(#ah)"/>
+      <path d="M230,336 L318,292" class="d-arrow" marker-end="url(#ah)"/>
+
+      <text x="320" y="18" class="d-m">AI AR COORDINATOR · CLAUDE</text>
+      <rect x="320" y="30" width="300" height="340" rx="6" class="d-core"/>
+      <text x="342" y="64" class="d-t">Prepares, never sends</text>
+      <text x="342" y="100" class="d-li">• Drafts fixed-fee and stage invoices</text>
+      <text x="342" y="128" class="d-li">• Prepares hourly drafts for FE review</text>
+      <text x="342" y="156" class="d-li">• Matches disbursements to matters</text>
+      <text x="342" y="184" class="d-li">• Builds monthly SOAs</text>
+      <text x="342" y="212" class="d-li">• Builds custom SOAs by matter or dept</text>
+      <text x="342" y="240" class="d-li">• Produces the weekly aging report</text>
+      <text x="342" y="268" class="d-li">• Drafts payment reminders per policy</text>
+      <text x="342" y="296" class="d-li">• Drafts answers to invoice questions</text>
+      <text x="342" y="324" class="d-li">• Flags overdue balances for escalation</text>
+      <text x="342" y="352" class="d-s">Works in the shared AR mailbox</text>
+
+      <path d="M620,200 L688,200" class="d-arrow-a" marker-end="url(#aha)"/>
+      <text x="700" y="128" class="d-gm">REVIEW GATE</text>
+      <rect x="690" y="140" width="140" height="120" rx="6" class="d-gate"/>
+      <text x="708" y="178" class="d-t">FM review</text>
+      <text x="708" y="202" class="d-s">Checks every draft</text>
+      <text x="708" y="222" class="d-s">Logs errors found</text>
+      <text x="708" y="242" class="d-s">Approves and sends</text>
+
+      <path d="M830,200 L868,200" class="d-arrow-a" marker-end="url(#aha)"/>
+      <rect x="870" y="160" width="115" height="80" rx="5" class="d-box"/>
+      <text x="886" y="194" class="d-t">Client</text>
+      <text x="886" y="216" class="d-s">via Outlook</text>
+
+      <rect x="320" y="400" width="300" height="66" rx="5" class="d-box"/>
+      <text x="342" y="428" class="d-t">Lawyers · FEs · HOD</text>
+      <text x="342" y="450" class="d-s">Confirm billing stages, approve hourly invoices</text>
+      <path d="M440,372 L440,398" class="d-arrow" marker-start="url(#ah)" marker-end="url(#ah)"/>
+
+      <path d="M760,260 L760,433 L622,433" class="d-arrow" marker-end="url(#ah)"/>
+      <text x="770" y="350" class="d-s">Escalates long-</text>
+      <text x="770" y="366" class="d-s">outstanding balances</text>
+    </svg>
+  </div>
+  <div class="legend">
+    <span><i class="sw core"></i>AI does the work</span>
+    <span><i class="sw gate"></i>Human sign-off</span>
+    <span><i class="sw build"></i>Doesn't exist yet</span>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <span class="eyebrow">Scope</span>
+    <h2>Three phases, lowest risk first</h2>
+  </div>
+  <div class="phases">
+    <article class="phase now">
+      <span class="tag">PHASE 1 · START HERE</span>
+      <h3>Statements and collections</h3>
+      <ul>
+        <li>Monthly SOAs from Zoho</li>
+        <li>Custom SOAs by matter or department</li>
+        <li>Weekly aging report</li>
+        <li>Payment reminder drafts</li>
+      </ul>
+      <p class="why">Fixes the starred pain point, SOA delays. It reads from Zoho and sends nothing on its own, so it's easy to verify.</p>
+    </article>
+    <article class="phase">
+      <span class="tag">PHASE 2</span>
+      <h3>Invoice preparation</h3>
+      <ul>
+        <li>Fixed-fee and stage invoices from LOEs</li>
+        <li>Month-end stage check-ins with lawyers</li>
+        <li>Translation, courier and publication matching</li>
+        <li>Disbursement reconciliation</li>
+      </ul>
+      <p class="why">Needs the LOE register built and lawyers in the loop to confirm stages.</p>
+    </article>
+    <article class="phase">
+      <span class="tag">PHASE 3</span>
+      <h3>Client questions and reporting</h3>
+      <ul>
+        <li>Answers to invoice questions</li>
+        <li>Time-log analysis</li>
+        <li>FE reports within AR</li>
+        <li>Mid-engagement changes</li>
+      </ul>
+      <p class="why">Needs the most judgment, so it comes last.</p>
+    </article>
+  </div>
+  <p class="note"><strong>Hourly invoices keep their approval chain (FE → HOD).</strong> The coordinator prepares the drafts and chases the approvals. It never approves.</p>
+</section>
+
+<section>
+  <div class="sec-head">
+    <span class="eyebrow">Intake</span>
+    <h2>Documents and files to collect</h2>
+    <p class="lede">Set each item's status and owner as it comes in.</p>
+  </div>
+  <div class="groups" id="intake"></div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <span class="eyebrow">Before the build</span>
+    <h2>Gaps on the worksheet</h2>
+  </div>
+  <div class="gaps" id="gaps"></div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <span class="eyebrow">Sequence</span>
+    <h2>Rough order of work</h2>
+  </div>
+  <div class="seq">
+    <div class="step"><span class="when">WEEK 1</span><h3>Collect and decide</h3><p>Process documents, system exports, contact map and access. Agree the confidentiality rules.</p></div>
+    <div class="step"><span class="when">MONTH 1</span><h3>Build Phase 1 on exports</h3><p>No live integrations yet. Run it beside the manual process and compare every SOA.</p></div>
+    <div class="step"><span class="when">AFTER PHASE 1 HOLDS</span><h3>Connect and extend</h3><p>Add Zoho and LMS API links, then start Phase 2 with the LOE register.</p></div>
+  </div>
+</section>
+
+<section id="workstream">
+  <div class="sec-head">
+    <span class="eyebrow">Workstream</span>
+    <h2>Who is doing what, by when</h2>
+  </div>
+  <div class="ws-summary" id="ws-summary"></div>
+  <div class="ws-board" id="ws-board"></div>
+  <form class="ws-add" id="ws-add">
+    <label for="wa-title">Task<input id="wa-title" required maxlength="200" placeholder="e.g. Draft escalation email to HOD"></label>
+    <label for="wa-stream">Stream<select id="wa-stream"></select></label>
+    <label for="wa-owner">Owner<input id="wa-owner" maxlength="40" placeholder="FM"></label>
+    <label for="wa-due">Due<input id="wa-due" type="date"></label>
+    <button type="submit">Add task</button>
+  </form>
+</section>
+
+<footer>Sources: Billing &amp; Collection process 2026; "Should We Hire AI?" worksheet, AR Coordinator, 18/10/2026. Next step owner: FM.</footer>
+</div>
+
+<script type="application/json" id="state">
+{
+"doc": "ar-coordinator-2026",
+"savedAt": "2026-10-20T00:00:00.000Z",
+"seat": [
+{
+"label": "Accountable owner",
+"value": "FM"
+},
+{
+"label": "Reviewed by",
+"value": "FM / COO, weekly"
+},
+{
+"label": "Gap today",
+"value": "~50k / month"
+},
+{
+"label": "Tool budget",
+"value": "~$200 / month"
+},
+{
+"label": "Profile",
+"value": "Replacement + augmentation"
+},
+{
+"label": "Fit scores",
+"value": "Seat 8/10 · People 0/10"
+}
+],
+"intake": [
+{
+"id": "i1",
+"group": "Process and policy",
+"title": "Billing & Collection process",
+"detail": "Add owners and deadlines, e.g. \"SOAs out by day X\"",
+"status": "have",
+"owner": ""
+},
+{
+"id": "i2",
+"group": "Process and policy",
+"title": "Debt collection policy",
+"detail": "Reminder timing, tone at each stage, when to escalate to HOD. Phase 1 depends on it",
+"status": "missing",
+"owner": ""
+},
+{
+"id": "i3",
+"group": "Process and policy",
+"title": "Payment terms",
+"detail": "Standard terms plus any client-specific ones",
+"status": "collect",
+"owner": ""
+},
+{
+"id": "i4",
+"group": "Process and policy",
+"title": "Approval matrix",
+"detail": "Who approves what, and what the AI may send without review (start at zero)",
+"status": "build",
+"owner": ""
+},
+{
+"id": "i5",
+"group": "Templates and examples",
+"title": "3–5 real SOAs",
+"detail": "Standard Zoho plus the custom matter-wise and department-wise versions",
+"status": "collect",
+"owner": ""
+},
+{
+"id": "i6",
+"group": "Templates and examples",
+"title": "Custom-SOA client list",
+"detail": "Each client's format and recipients",
+"status": "collect",
+"owner": ""
+},
+{
+"id": "i7",
+"group": "Templates and examples",
+"title": "Sample invoices of each type",
+"detail": "Fixed-fee, stage, hourly, translation/courier/publication, disbursement",
+"status": "collect",
+"owner": ""
+},
+{
+"id": "i8",
+"group": "Templates and examples",
+"title": "Current reminder emails",
+"detail": "First reminder through final notice",
+"status": "collect",
+"owner": ""
+},
+{
+"id": "i9",
+"group": "Templates and examples",
+"title": "10–20 past client questions",
+"detail": "Invoice questions with the answers given. Basis for Phase 3",
+"status": "collect",
+"owner": ""
+},
+{
+"id": "i10",
+"group": "Data",
+"title": "Zoho exports",
+"detail": "Customer list, AR aging, a few months of payment allocations",
+"status": "collect",
+"owner": ""
+},
+{
+"id": "i11",
+"group": "Data",
+"title": "LMS exports",
+"detail": "Matter list with client, department, responsible FE; sample time entries",
+"status": "collect",
+"owner": ""
+},
+{
+"id": "i12",
+"group": "Data",
+"title": "LOE register",
+"detail": "One row per matter: fee type, amount, stages, terms. Terms sit in PDFs today",
+"status": "build",
+"owner": ""
+},
+{
+"id": "i13",
+"group": "Data",
+"title": "One month of disbursement records",
+"detail": "Clerk fees, card statements, supplier invoices, for testing reconciliation",
+"status": "collect",
+"owner": ""
+},
+{
+"id": "i14",
+"group": "Data",
+"title": "Client contact map",
+"detail": "Client to matters to contacts: who gets SOAs, who gets reminders",
+"status": "build",
+"owner": ""
+},
+{
+"id": "i15",
+"group": "Systems and access",
+"title": "LMS product and API",
+"detail": "API or export-only decides how much can be automated",
+"status": "confirm",
+"owner": ""
+},
+{
+"id": "i16",
+"group": "Systems and access",
+"title": "Zoho product and plan",
+"detail": "Books or Invoice, and whether API access is included",
+"status": "confirm",
+"owner": ""
+},
+{
+"id": "i17",
+"group": "Systems and access",
+"title": "Shared AR mailbox",
+"detail": "Microsoft 365 mailbox the AI drafts into, not a personal inbox",
+"status": "build",
+"owner": ""
+},
+{
+"id": "i18",
+"group": "Systems and access",
+"title": "Claude Team or Enterprise",
+"detail": "Firm data excluded from training; MFA and SSO on",
+"status": "build",
+"owner": ""
+}
+],
+"gaps": [
+{
+"id": "g1",
+"sev": "crit",
+"label": "COMPLIANCE",
+"title": "Client confidentiality needs a written decision",
+"body": "SOAs and time entries carry client names, matter details and work descriptions. Decide which data may go to the AI and who signs off (FM plus a partner). Check it against the data-protection rules that apply to the firm.",
+"status": "open",
+"owner": ""
+},
+{
+"id": "g2",
+"sev": "crit",
+"label": "CARES",
+"title": "Tell the person whose role changes",
+"body": "The worksheet says the work is \"carved out from the job description\" but not whether they've been told. Settle that before anything starts.",
+"status": "open",
+"owner": ""
+},
+{
+"id": "g3",
+"sev": "warn",
+"label": "METRICS · WEEKLY KPI",
+"title": "Pick leading indicators",
+"body": "Use % of SOAs sent by day N, error rate found at review, invoices issued within N days of month-end, and the DSO trend.",
+"status": "open",
+"owner": ""
+},
+{
+"id": "g4",
+"sev": "warn",
+"label": "MANAGE · OFF-RAMP",
+"title": "Put a number on \"data errors\"",
+"body": "For example: more than 2 client-facing errors in a month, or Phase 1 error rate above 5% after 8 weeks, means pause and go back to manual.",
+"status": "open",
+"owner": ""
+},
+{
+"id": "g5",
+"sev": "warn",
+"label": "COST",
+"title": "Budget the build, not just the subscription",
+"body": "$200 a month covers Claude. Integration and setup work needs its own time or budget.",
+"status": "open",
+"owner": ""
+},
+{
+"id": "g6",
+"sev": "warn",
+"label": "SECURITY BASELINE",
+"title": "MFA box is still unticked",
+"body": "Confirm MFA, access controls and retention settings before any firm data goes in.",
+"status": "open",
+"owner": ""
+}
+],
+"tasks": [
+{
+"id": "t1",
+"stream": "gov",
+"title": "Brief the person whose role changes",
+"owner": "FM",
+"status": "todo",
+"due": "2026-10-23",
+"notes": ""
+},
+{
+"id": "t2",
+"stream": "gov",
+"title": "Confidentiality decision: what data may go to the AI, signed by FM and a partner",
+"owner": "FM",
+"status": "todo",
+"due": "2026-10-27",
+"notes": ""
+},
+{
+"id": "t3",
+"stream": "gov",
+"title": "Confirm MFA, access controls and retention (security baseline)",
+"owner": "FM",
+"status": "todo",
+"due": "2026-10-27",
+"notes": ""
+},
+{
+"id": "t4",
+"stream": "gov",
+"title": "Set weekly KPIs: SOAs on time %, review error rate, invoice lag, DSO",
+"owner": "FM",
+"status": "todo",
+"due": "2026-10-27",
+"notes": ""
+},
+{
+"id": "t5",
+"stream": "gov",
+"title": "Define the off-ramp threshold for data errors",
+"owner": "FM / COO",
+"status": "todo",
+"due": "2026-10-27",
+"notes": ""
+},
+{
+"id": "t6",
+"stream": "gov",
+"title": "Approve build budget beyond the $200/month subscription",
+"owner": "COO",
+"status": "todo",
+"due": "2026-10-30",
+"notes": ""
+},
+{
+"id": "t7",
+"stream": "gov",
+"title": "Write the approval matrix (who approves what; AI sends nothing unreviewed)",
+"owner": "FM",
+"status": "todo",
+"due": "2026-10-30",
+"notes": ""
+},
+{
+"id": "t8",
+"stream": "intake",
+"title": "Obtain the debt collection policy",
+"owner": "FM",
+"status": "todo",
+"due": "2026-10-24",
+"notes": ""
+},
+{
+"id": "t9",
+"stream": "intake",
+"title": "Add owners and deadlines to the Billing & Collection process",
+"owner": "FM",
+"status": "todo",
+"due": "2026-10-27",
+"notes": ""
+},
+{
+"id": "t10",
+"stream": "intake",
+"title": "Collect standard and client-specific payment terms",
+"owner": "",
+"status": "todo",
+"due": "2026-10-27",
+"notes": ""
+},
+{
+"id": "t11",
+"stream": "intake",
+"title": "Confirm LMS product and whether it has an API",
+"owner": "",
+"status": "todo",
+"due": "2026-10-24",
+"notes": ""
+},
+{
+"id": "t12",
+"stream": "intake",
+"title": "Confirm Zoho product, plan and API access",
+"owner": "",
+"status": "todo",
+"due": "2026-10-24",
+"notes": ""
+},
+{
+"id": "t13",
+"stream": "intake",
+"title": "Export from Zoho: customer list, AR aging, payment allocations",
+"owner": "",
+"status": "todo",
+"due": "2026-10-28",
+"notes": ""
+},
+{
+"id": "t14",
+"stream": "intake",
+"title": "Export from LMS: matter list (client, dept, FE) and sample time entries",
+"owner": "",
+"status": "todo",
+"due": "2026-10-28",
+"notes": ""
+},
+{
+"id": "t15",
+"stream": "intake",
+"title": "Collect 3–5 SOAs (standard and custom) and the custom-SOA client list",
+"owner": "",
+"status": "todo",
+"due": "2026-10-28",
+"notes": ""
+},
+{
+"id": "t16",
+"stream": "intake",
+"title": "Collect sample invoices of each type and current reminder emails",
+"owner": "",
+"status": "todo",
+"due": "2026-10-28",
+"notes": ""
+},
+{
+"id": "t17",
+"stream": "intake",
+"title": "Build the client contact map (SOA and reminder recipients)",
+"owner": "",
+"status": "todo",
+"due": "2026-10-31",
+"notes": ""
+},
+{
+"id": "t18",
+"stream": "intake",
+"title": "Set up the shared AR mailbox in Microsoft 365",
+"owner": "",
+"status": "todo",
+"due": "2026-10-31",
+"notes": ""
+},
+{
+"id": "t19",
+"stream": "intake",
+"title": "Set up Claude Team or Enterprise with SSO and MFA",
+"owner": "FM",
+"status": "todo",
+"due": "2026-10-31",
+"notes": ""
+},
+{
+"id": "t20",
+"stream": "p1",
+"title": "Build the monthly SOA workflow from Zoho exports",
+"owner": "",
+"status": "todo",
+"due": "2026-11-14",
+"notes": ""
+},
+{
+"id": "t21",
+"stream": "p1",
+"title": "Build custom SOAs by matter and department",
+"owner": "",
+"status": "todo",
+"due": "2026-11-14",
+"notes": ""
+},
+{
+"id": "t22",
+"stream": "p1",
+"title": "Build the weekly aging report and reminder drafts per policy",
+"owner": "",
+"status": "todo",
+"due": "2026-11-21",
+"notes": ""
+},
+{
+"id": "t23",
+"stream": "p1",
+"title": "Parallel run against the manual process for November month-end",
+"owner": "FM",
+"status": "todo",
+"due": "2026-12-05",
+"notes": ""
+},
+{
+"id": "t24",
+"stream": "p1",
+"title": "Go / no-go review against KPIs and off-ramp threshold",
+"owner": "FM / COO",
+"status": "todo",
+"due": "2026-12-12",
+"notes": ""
+},
+{
+"id": "t25",
+"stream": "p2",
+"title": "Build the LOE register (fee type, amount, stages, terms per matter)",
+"owner": "",
+"status": "todo",
+"due": "2026-12-19",
+"notes": ""
+},
+{
+"id": "t26",
+"stream": "p2",
+"title": "Connect Zoho and LMS APIs",
+"owner": "",
+"status": "todo",
+"due": "2027-01-15",
+"notes": ""
+},
+{
+"id": "t27",
+"stream": "p2",
+"title": "Fixed-fee and stage invoice drafts with month-end lawyer check-ins",
+"owner": "",
+"status": "todo",
+"due": "2027-01-31",
+"notes": ""
+},
+{
+"id": "t28",
+"stream": "p2",
+"title": "Disbursement and supplier invoice reconciliation",
+"owner": "",
+"status": "todo",
+"due": "2027-01-31",
+"notes": ""
+},
+{
+"id": "t29",
+"stream": "p3",
+"title": "Collect 10–20 past client invoice questions and answers",
+"owner": "",
+"status": "todo",
+"due": "2027-01-31",
+"notes": ""
+},
+{
+"id": "t30",
+"stream": "p3",
+"title": "Draft answers to client invoice questions and time-log analysis",
+"owner": "",
+"status": "todo",
+"due": "2027-02-28",
+"notes": ""
+},
+{
+"id": "t31",
+"stream": "p3",
+"title": "FE reports within AR",
+"owner": "",
+"status": "todo",
+"due": "2027-02-28",
+"notes": ""
+}
+]
+}
+</script>
+<script>
+(function(){
+  // Snapshot the untouched document first: downloads are this template with the current state swapped in.
+  var TEMPLATE='<!doctype html>\n'+document.documentElement.outerHTML;
+  var embedded=JSON.parse(document.getElementById('state').textContent);
+  var KEY='ar-coord-state:'+embedded.doc;
+  var S=embedded, storageOk=true;
+  try{
+    var stored=JSON.parse(localStorage.getItem(KEY)||'null');
+    if(stored&&stored.doc===embedded.doc&&stored.savedAt>embedded.savedAt)S=stored;
+  }catch(e){storageOk=false}
+
+  var STREAMS=[['gov','Setup and governance'],['intake','Intake: documents and access'],['p1','Phase 1 · Statements and collections'],['p2','Phase 2 · Invoice preparation'],['p3','Phase 3 · Client questions and reporting']];
+  var TASK_ST=[['todo','To do'],['doing','In progress'],['blocked','Blocked'],['done','Done']];
+  var INTAKE_ST=[['have','Have','ok'],['received','Received','ok'],['missing','Missing','crit'],['collect','To collect','acc'],['confirm','To confirm','acc'],['build','To build','warn'],['setup','To set up','warn']];
+  var GAP_ST=[['open','Open','crit'],['progress','In progress','warn'],['resolved','Resolved','ok']];
+  var SEV=[['crit','Critical'],['warn','Warning']];
+  var today=(function(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')})(new Date());
+  var saveEl=document.getElementById('save-state'), dirty=false;
+
+  function el(tag,cls,text){var n=document.createElement(tag);if(cls)n.className=cls;if(text!=null)n.textContent=text;return n}
+  function save(){
+    S.savedAt=new Date().toISOString();dirty=true;
+    try{localStorage.setItem(KEY,JSON.stringify(S));saveEl.className='save-state';saveEl.textContent='Saved in this browser '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}
+    catch(e){storageOk=false;saveEl.className='save-state warn';saveEl.textContent='Not saved yet: download a copy before closing'}
+  }
+  function editable(obj,key,cls,tag,ph){
+    var n=el(tag||'span',(cls?cls+' ':'')+'ed',obj[key]||'');
+    n.contentEditable='true';n.spellcheck=true;if(ph)n.dataset.ph=ph;
+    n.addEventListener('paste',function(e){e.preventDefault();var t=(e.clipboardData||window.clipboardData).getData('text/plain');document.execCommand('insertText',false,t)});
+    n.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();n.blur()}});
+    n.addEventListener('blur',function(){var v=n.textContent.replace(/\s+/g,' ').trim();if(v!==(obj[key]||'')){obj[key]=v;save();renderSummary()}});
+    return n;
+  }
+  function chipSelect(obj,key,opts,label,onChange){
+    var s=el('select','chipsel');s.setAttribute('aria-label',label);
+    opts.forEach(function(o){var op=el('option',null,o[1]);op.value=o[0];if(o[0]===obj[key])op.selected=true;s.appendChild(op)});
+    function tone(){var m=opts.filter(function(o){return o[0]===s.value})[0];s.className='chipsel '+((m&&m[2])||'')}
+    tone();
+    s.addEventListener('change',function(){obj[key]=s.value;tone();save();if(onChange)onChange()});
+    return s;
+  }
+  function textInput(obj,key,cls,label,ph,type){
+    var i=el('input',cls);i.type=type||'text';i.value=obj[key]||'';if(ph)i.placeholder=ph;i.setAttribute('aria-label',label);
+    i.addEventListener('change',function(){obj[key]=i.value.trim();save();if(type==='date')renderTasks()});
+    return i;
+  }
+
+  function renderSeat(){
+    var dl=document.getElementById('seat');dl.innerHTML='';
+    S.seat.forEach(function(f){var d=el('div');d.appendChild(el('dt',null,f.label));d.appendChild(editable(f,'value',null,'dd','—'));dl.appendChild(d)});
+  }
+  function renderIntake(){
+    var box=document.getElementById('intake');box.innerHTML='';
+    var groups=[];S.intake.forEach(function(i){if(groups.indexOf(i.group)<0)groups.push(i.group)});
+    groups.forEach(function(g){
+      var gd=el('div','group');gd.appendChild(el('h3',null,g));
+      S.intake.filter(function(i){return i.group===g}).forEach(function(i){
+        var row=el('div','item'),left=el('div');
+        left.appendChild(editable(i,'title',null,'b','Item'));
+        left.appendChild(editable(i,'detail',null,'small','Add detail'));
+        var side=el('div','item-side');
+        side.appendChild(chipSelect(i,'status',INTAKE_ST,'Status: '+i.title));
+        side.appendChild(textInput(i,'owner','mini','Owner: '+i.title,'Owner'));
+        row.append(left,side);gd.appendChild(row);
+      });
+      box.appendChild(gd);
+    });
+  }
+  function renderGaps(){
+    var box=document.getElementById('gaps');box.innerHTML='';
+    S.gaps.forEach(function(g){
+      var row=el('div','gap '+g.sev+(g.status==='resolved'?' done':'')),mid=el('div');
+      mid.appendChild(editable(g,'label','ws',null,'Area'));
+      mid.appendChild(editable(g,'title',null,'h3','Title'));
+      mid.appendChild(editable(g,'body',null,'p','Describe the gap'));
+      var side=el('div','gap-side');
+      side.appendChild(chipSelect(g,'status',GAP_ST,'Status: '+g.title,renderGaps));
+      side.appendChild(chipSelect(g,'sev',SEV.map(function(x){return [x[0],x[1],x[0]==='crit'?'crit':'warn']}),'Severity: '+g.title,renderGaps));
+      side.appendChild(textInput(g,'owner','mini','Owner: '+g.title,'Owner'));
+      row.append(mid,side);box.appendChild(row);
+    });
+  }
+  function renderSummary(){
+    var c={todo:0,doing:0,blocked:0,done:0},late=0,sum=document.getElementById('ws-summary');
+    S.tasks.forEach(function(t){c[t.status]++;if(t.status!=='done'&&t.due&&t.due<today)late++});
+    sum.innerHTML='';
+    [['To do',c.todo],['In progress',c.doing],['Blocked',c.blocked],['Done',c.done+' of '+S.tasks.length]].forEach(function(p){var s=el('span');s.append(p[0]+' ');s.appendChild(el('b',null,String(p[1])));sum.appendChild(s)});
+    var o=el('span','od');o.append('Overdue ');o.appendChild(el('b',null,String(late)));sum.appendChild(o);
+  }
+  function renderTasks(){
+    renderSummary();
+    var board=document.getElementById('ws-board');board.innerHTML='';
+    if(!S.tasks.length){board.appendChild(el('p','ws-msg','No tasks yet. Add the first one below.'));return}
+    STREAMS.forEach(function(st){
+      var rows=S.tasks.filter(function(t){return t.stream===st[0]});
+      if(!rows.length)return;
+      var g=el('div','ws-stream'),h=el('div','ws-stream-h');
+      h.appendChild(el('h3',null,st[1]));
+      h.appendChild(el('span',null,rows.filter(function(t){return t.status==='done'}).length+' / '+rows.length+' done'));
+      g.appendChild(h);
+      rows.forEach(function(t){
+        var r=el('div','ws-row'+(t.status==='done'?' done':'')+(t.status!=='done'&&t.due&&t.due<today?' late':''));
+        var s=el('select','st');s.setAttribute('aria-label','Status: '+t.title);s.dataset.s=t.status;
+        TASK_ST.forEach(function(x){var op=el('option',null,x[1]);op.value=x[0];if(x[0]===t.status)op.selected=true;s.appendChild(op)});
+        s.addEventListener('change',function(){t.status=s.value;save();renderTasks()});
+        var del=el('button','ws-del','×');del.type='button';del.setAttribute('aria-label','Delete task: '+t.title);
+        var armT;
+        del.addEventListener('click',function(){
+          if(!del.classList.contains('arm')){del.classList.add('arm');del.textContent='Delete?';armT=setTimeout(function(){del.classList.remove('arm');del.textContent='×'},3000);return}
+          clearTimeout(armT);S.tasks=S.tasks.filter(function(x){return x!==t});save();renderTasks();
+        });
+        r.append(s,editable(t,'title','ws-title',null,'Task'),textInput(t,'owner','ow','Owner: '+t.title,'Owner'),textInput(t,'due','du','Due date: '+t.title,null,'date'),del);
+        r.appendChild(editable(t,'notes','ws-notes',null,'Add a note'));
+        g.appendChild(r);
+      });
+      board.appendChild(g);
+    });
+  }
+
+  var sel=document.getElementById('wa-stream');
+  STREAMS.forEach(function(st){var o=el('option',null,st[1]);o.value=st[0];sel.appendChild(o)});
+  document.getElementById('ws-add').addEventListener('submit',function(e){
+    e.preventDefault();
+    var ti=document.getElementById('wa-title'),ow=document.getElementById('wa-owner'),du=document.getElementById('wa-due');
+    if(!ti.value.trim())return;
+    S.tasks.push({id:'t'+Date.now(),stream:sel.value,title:ti.value.trim(),owner:ow.value.trim(),status:'todo',due:du.value,notes:''});
+    ti.value='';ow.value='';du.value='';save();renderTasks();
+  });
+
+  document.getElementById('download').addEventListener('click',function(){
+    if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
+    S.savedAt=new Date().toISOString();
+    try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+    var json=JSON.stringify(S).replace(/</g,'\\u003c');
+    var html=TEMPLATE.replace(/(<script type="application\/json" id="state">)[\s\S]*?(<\/script>)/,function(_,a,b){return a+'\n'+json+'\n'+b});
+    var blob=new Blob([html],{type:'text/html'}),a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);a.download='AI-AR-Coordinator-Build-'+today+'.html';
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){URL.revokeObjectURL(a.href)},2000);
+    dirty=false;saveEl.className='save-state';saveEl.textContent='Copy downloaded '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  });
+  window.addEventListener('beforeunload',function(e){if(dirty&&!storageOk){e.preventDefault();e.returnValue=''}});
+
+  if(!storageOk){saveEl.className='save-state warn';saveEl.textContent='This browser won\'t keep edits: download a copy before closing'}
+  else if(S!==embedded){saveEl.textContent='Showing your saved edits'}
+  renderSeat();renderIntake();renderGaps();renderTasks();
+})();
+
+</script>
+</body>
+</html>
